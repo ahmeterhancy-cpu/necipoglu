@@ -70,6 +70,12 @@
 
         <div class="flex flex-wrap items-center justify-between gap-4 py-8">
             <span class="eyebrow eyebrow-mute">© {{ now()->year }} {{ Setting::get('legal_name', config('site.company.legal_name')) }}</span>
+
+            {{-- Ajans imzası: iki dilde de aynı metin, marka adı çevrilmez. --}}
+            <a href="https://www.amesis.com.tr" target="_blank" rel="noopener" data-no-veil class="eyebrow eyebrow-mute link">
+                Web site by Amesis 360
+            </a>
+
             <a href="mailto:{{ Setting::get('email', config('site.company.email')) }}" data-no-veil class="eyebrow link">
                 {{ Setting::get('email', config('site.company.email')) }}
             </a>
