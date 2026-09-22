@@ -17,6 +17,28 @@ public_html/
 
 ---
 
+## Canlı kurulum (2026-09-22) — gerçek değerler
+
+| | |
+|---|---|
+| cPanel hesabı | `neci2913` (Turhost, CloudLinux) |
+| PHP | Select PHP Version → **8.4** (8.3'ten alındı; vendor 8.4.1 ister) |
+| Depo (sunucu) | `/home/neci2913/repositories/necipoglu` ← github.com/ahmeterhancy-cpu/necipoglu |
+| Uygulama | `public_html/necipoglu_app` (+ `.env`, `.htaccess` → 403 doğrulandı) |
+| Veritabanı | `neci2913_site`, kullanıcı `neci2913_necipog` (cPanel 16 karakterde keser) |
+| Eski site | `public_html/index.html.eski` (orijinali cPanel çöp kutusunda) |
+
+İlk kurulumda çıkan sorunlar (hepsi çözüldü, kodda kalıcı):
+
+1. **MySQL varsayılan motoru MyISAM** → `users.email` benzersiz anahtarı "max key
+   length is 1000 bytes". `config/database.php` artık `engine => InnoDB`.
+   Yarım kalan ilk veritabanı (`neci2913_necipog`) boş; silinebilir.
+2. **Önbellekli config** → `.env`'de veritabanı adı değişti ama göçler eskisine
+   bağlandı. `.cpanel.yml` artık göçlerden önce `config:clear` çalıştırır.
+3. **APP_KEY** elle yapıştırılmaz: `.env`'de yoksa deploy üretir.
+
+---
+
 ## 0 · Önce öğrenilecekler
 
 | Soru | Neden |
