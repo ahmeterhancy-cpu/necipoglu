@@ -6,10 +6,12 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use App\Filament\Auth\Login;
 use App\Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -25,8 +27,11 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login(Login::class)
             ->brandName('Cahit Necipoğlu')
+            ->brandLogo(fn () => asset('brand/logo-dark.png'))
+            ->darkModeBrandLogo(fn () => asset('brand/logo-light.png'))
+            ->brandLogoHeight('1.6rem')
             ->favicon(asset('favicon.svg'))
             // Panel sitenin antrasit kimliğini taşır.
             ->colors([
@@ -50,6 +55,10 @@ class AdminPanelProvider extends PanelProvider
             // Varsayılan "Hoş geldin / Oturumu kapat" kartı bilerek yok —
             // oturum kapatma sağ üstteki kullanıcı menüsünde.
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            // Giriş ekranı: stil ve alt bilgi yalnız o sayfaya basılır
+            // (panelde derlenmiş özel tema yok, bkz. resources/views/filament/auth).
+            ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('filament.auth.stil'), scopes: Login::class)
+            ->renderHook(PanelsRenderHook::AUTH_LOGIN_FORM_AFTER, fn () => view('filament.auth.alt-bilgi'))
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
