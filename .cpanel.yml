@@ -17,6 +17,9 @@
 #  4. .env ve storage/ kopyalanmaz; yalnızca iskelet kurulur.
 #  5. Her adım ~/deploy-son.log dosyasına yazar — cPanel hata göstermiyor.
 #
+# config:clear göçlerden ÖNCE: önceki deploy'un `optimize` önbelleği duruyorsa
+# .env'deki değişiklik (ör. veritabanı adı) okunmaz, göçler eski ayarla koşar.
+#
 # Veritabanını sıfırlayan ya da db:seed çalıştıran görev BİLEREK YOK. İlk
 # kurulum verisi `site:kur` ile gelir; o komut veritabanı doluysa hiçbir şey
 # yapmaz.
@@ -50,6 +53,7 @@ deployment:
     - /bin/mkdir -p $WEBROOT/storage >> $LOG 2>&1
     - /bin/cp -rn deploy/ilk-medya/media $WEBROOT/storage/ >> $LOG 2>&1 || true
     - echo "--- 6/6 gocler, ilk kurulum, onbellek, yonetici ---" >> $LOG 2>&1
+    - cd $APPPATH && $PHPBIN artisan config:clear >> $LOG 2>&1 || true
     - cd $APPPATH && test -f .env && /bin/grep -q "^APP_KEY=base64" .env || $PHPBIN artisan key:generate --force >> $LOG 2>&1 || echo "APP_KEY URETILEMEDI - .env var mi" >> $LOG 2>&1
     - cd $APPPATH && $PHPBIN artisan migrate --force >> $LOG 2>&1 || echo "MIGRATE ATLANDI - .env ve vendor var mi" >> $LOG 2>&1
     - cd $APPPATH && $PHPBIN artisan site:kur >> $LOG 2>&1 || echo "SITE KURULUMU ATLANDI" >> $LOG 2>&1
