@@ -22,6 +22,8 @@
     <title>{{ Setting::get('site_name', config('site.company.short_name')) }}</title>
 
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('brand/icon-32.png') }}" sizes="32x32" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('brand/icon-180.png') }}">
 
     {{-- Yalnızca stil: hareket motoru yüklenmez, içerik gizlenip gösterilmez. --}}
     @vite(['resources/css/app.css'])

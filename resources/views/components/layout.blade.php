@@ -53,8 +53,10 @@
         <meta name="twitter:card" content="summary_large_image">
     @endif
 
+    {{-- Sekme ikonu: yeni logodan türetilmiş CN işareti (antrasit + mavi kanca). --}}
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="{{ asset('brand/logo.png') }}">
+    <link rel="icon" href="{{ asset('brand/icon-32.png') }}" sizes="32x32" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('brand/icon-180.png') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
