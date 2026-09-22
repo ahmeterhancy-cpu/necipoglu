@@ -58,7 +58,10 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'strict' => true,
-            'engine' => null,
+            // Turhost'taki MySQL varsayılan motoru MyISAM: anahtar sınırı 1000
+            // bayt (utf8mb4 varchar(255) = 1020 → "key too long"), yabancı
+            // anahtar ve transaction da yok. Tablolar InnoDB ile açılır.
+            'engine' => env('DB_ENGINE', 'InnoDB'),
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
@@ -78,7 +81,10 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'strict' => true,
-            'engine' => null,
+            // Turhost'taki MySQL varsayılan motoru MyISAM: anahtar sınırı 1000
+            // bayt (utf8mb4 varchar(255) = 1020 → "key too long"), yabancı
+            // anahtar ve transaction da yok. Tablolar InnoDB ile açılır.
+            'engine' => env('DB_ENGINE', 'InnoDB'),
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
