@@ -6,12 +6,13 @@ use App\Models\User;
 use Illuminate\Console\Command;
 
 /**
- * Yönetici hesabını .env'deki bilgilerden açar.
+ * İLK yönetici hesabını .env'deki bilgilerden açar.
  *
- * Paylaşımlı sunucuda SSH/Terminal olmayabiliyor; `tinker` ile hesap açmak
- * mümkün değil. Bu komut deploy görevleri arasında çalışır ve FİKİRSİZDİR:
- * hesap zaten varsa hiçbir şey yapmaz, parolayı da ezmez. Yani her deploy'da
- * güvenle koşabilir.
+ * Yöneticiler veritabanında (`users.is_admin`) durur ve panelden (Kurumsal >
+ * Yöneticiler) yönetilir. Ama panele girecek ilk hesap bir yerden gelmeli:
+ * sunucuda SSH/Terminal yok, `tinker` çalıştırılamıyor. Bu komut deploy
+ * görevleri arasında koşar ve YALNIZCA HİÇ YÖNETİCİ YOKKEN iş yapar; bir
+ * yönetici oluştuktan sonra .env'deki ADMIN_* satırları tamamen etkisizdir.
  */
 class CreateAdminUser extends Command
 {
@@ -20,10 +21,16 @@ class CreateAdminUser extends Command
         {--parola= : .env yerine burada verilen parola}
         {--ad= : Görünen ad}';
 
-    protected $description = 'ADMIN_EMAIL / ADMIN_PASSWORD ile yönetici hesabı açar (hesap varsa dokunmaz)';
+    protected $description = 'Hiç yönetici yoksa ADMIN_EMAIL / ADMIN_PASSWORD ile ilk yöneticiyi açar';
 
     public function handle(): int
     {
+        if (User::where('is_admin', true)->exists()) {
+            $this->info('Yönetici var; ilk hesap adımı atlandı (yöneticiler panelden yönetilir).');
+
+            return self::SUCCESS;
+        }
+
         // config üzerinden okunuyor, env() ile değil: config önbelleğe
         // alındığında Laravel .env'i hiç yüklemez ve env() null döner.
         $email = $this->option('eposta') ?: config('site.admin.email');
@@ -54,7 +61,7 @@ class CreateAdminUser extends Command
         $user->forceFill(['is_admin' => true, 'email_verified_at' => now()])->save();
 
         $this->info($email.' yönetici olarak açıldı.');
-        $this->warn('Panele girdikten sonra .env içindeki ADMIN_PASSWORD satırını silin.');
+        $this->warn('Panele girdikten sonra .env içindeki ADMIN_PASSWORD satırını silin; diğer yöneticileri panelden ekleyin.');
 
         return self::SUCCESS;
     }

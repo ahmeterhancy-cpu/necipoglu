@@ -98,7 +98,8 @@ deploy'u tekrarlamak yeter.
 5. `site:kur` — **yalnızca veritabanı boşken**: şubeler, kategoriler, site
    ayarları, 30 marka ve tanıtım yazıları; **yapım aşaması sayfası AÇIK** gelir.
    Örnek ürün ve referanslar canlıya girmez.
-6. `admin:olustur` — hesap yoksa açar, varsa dokunmaz
+6. `admin:olustur` — **hiç yönetici yokken** `.env`'deki ADMIN_* ile ilk hesabı açar;
+   diğer yöneticiler panelden eklenir (Kurumsal > Yöneticiler)
 7. `optimize`, `filament:optimize`
 
 `migrate:fresh` ve `db:seed` deploy'da **yok ve olmamalı**.
