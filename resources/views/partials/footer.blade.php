@@ -16,7 +16,7 @@
     <div class="shell">
         <div class="grid12 gap-y-12">
             <div class="col-span-12 lg:col-span-4">
-                <img src="{{ asset('brand/logo-light.png') }}" alt="Cahit Necipoğlu" width="724" height="188" class="h-6 w-auto">
+                <img src="{{ asset('brand/logo-light.png') }}" alt="Cahit Necipoğlu" width="425" height="59" class="h-6 w-auto">
                 <p class="body-m mt-6 max-w-[34ch]">{{ __('site.footer.tagline') }}</p>
 
                 @if ($social->isNotEmpty())

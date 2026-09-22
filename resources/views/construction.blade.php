@@ -31,7 +31,7 @@
 
         <img src="{{ asset('brand/logo-light.png') }}"
              alt="Cahit Necipoğlu"
-             width="724" height="188"
+             width="425" height="59"
              class="h-auto w-[clamp(9rem,16vw,12rem)]">
 
         <div class="grid12 my-auto items-end gap-y-12 py-[clamp(3rem,8vw,6rem)]">

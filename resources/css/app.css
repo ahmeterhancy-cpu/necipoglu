@@ -652,7 +652,7 @@ html:not(.motion-ready) [data-veil] > img { clip-path: none; transform: none; }
   display: block;
   flex-shrink: 0;
   height: clamp(1.5rem, 2.3vw, 2.125rem);
-  aspect-ratio: 181 / 47;
+  aspect-ratio: 425 / 59;
 }
 
 .topbar-logo img {

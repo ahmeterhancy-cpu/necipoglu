@@ -3,8 +3,8 @@
 <header class="topbar">
     <div class="shell topbar-inner">
         <a href="{{ Locale::route('home') }}" class="topbar-logo" aria-label="{{ __('site.nav.home') }}">
-            <img src="{{ asset('brand/logo-light.png') }}" class="logo-light" alt="Cahit Necipoğlu" width="724" height="188">
-            <img src="{{ asset('brand/logo-dark.png') }}" class="logo-dark" alt="" aria-hidden="true" width="724" height="188">
+            <img src="{{ asset('brand/logo-light.png') }}" class="logo-light" alt="Cahit Necipoğlu" width="425" height="59">
+            <img src="{{ asset('brand/logo-dark.png') }}" class="logo-dark" alt="" aria-hidden="true" width="425" height="59">
         </a>
 
         <nav class="nav" aria-label="{{ __('site.nav.menu') }}">
