@@ -39,7 +39,7 @@ class PanelAnasayfaTest extends TestCase
 
     public function test_bos_veritabaninda_tum_bilesenler_calisir(): void
     {
-        Livewire::test(OzetKartlari::class)->assertOk()->assertSee('Okunmamış mesaj')->assertSee('Hepsi okundu');
+        Livewire::test(OzetKartlari::class)->assertOk()->assertSee('Okunmamış mesaj')->assertSee('Hepsi okundu')->assertSee('Henüz ürün eklenmedi');
         Livewire::test(SonMesajlar::class)->assertOk()->assertSee('Henüz mesaj yok');
         Livewire::test(SiteDurumu::class)->assertOk()->assertSee('Yapım aşamasında')->assertSee('Yok');
         Livewire::test(YayinHazirligi::class)->assertOk()->assertSee('Katalogda henüz ürün yok')->assertSee('0 / 9')->assertDontSee('1 / 9');

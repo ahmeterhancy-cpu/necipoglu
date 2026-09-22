@@ -55,7 +55,11 @@ class OzetKartlari extends StatsOverviewWidget
                 ->color('primary'),
 
             Stat::make('Yayındaki ürün', $yayinda)
-                ->description($urun === $yayinda ? 'Katalogdaki tüm ürünler' : ($urun - $yayinda).' ürün taslakta')
+                ->description(match (true) {
+                    $urun === 0 => 'Henüz ürün eklenmedi',
+                    $urun === $yayinda => 'Katalogdaki tüm ürünler',
+                    default => ($urun - $yayinda).' ürün taslakta',
+                })
                 ->descriptionIcon(Heroicon::OutlinedSquares2x2)
                 ->color('gray')
                 ->url(ProductResource::getUrl('index')),
