@@ -1,0 +1,59 @@
+---
+# cPanel → Git Version Control → Manage → "Deploy HEAD Commit" bunu çalıştırır.
+# Klonlamak dosyaları public_html'e KOYMAZ; taşıyan adım budur.
+#
+# YERLEŞİM: uygulama public_html/necipoglu_app/ altına, Laravel'in public/
+# içeriği doğrudan public_html'e gider. necipoglu_app/.htaccess klasörü web'e
+# kapatır — o dosya olmazsa .env okunur.
+#
+# KURULUMDAN ÖNCE: aşağıdaki iki satırdaki KULLANICI'yı cPanel kullanıcı
+# adıyla değiştirin (sağ üstte görünen ad).
+#
+# KURALLAR (her biri saatler yedi, bkz. F:\Yazılımlar\CPANEL-GIT-DEPLOY.md):
+#  1. Her görev TEK SATIR.
+#  2. Görev metinlerinde "iki nokta + boşluk" YOK — YAML geçersiz olur, cPanel
+#     deploy'u sessizce düşürür ve "Last Deployed" eski commit'te donar.
+#  3. Mutlak yol (/bin/cp …). rsync ve tar yok; joker, find, boru yok.
+#  4. .env ve storage/ kopyalanmaz; yalnızca iskelet kurulur.
+#  5. Her adım ~/deploy-son.log dosyasına yazar — cPanel hata göstermiyor.
+#
+# Veritabanını sıfırlayan ya da db:seed çalıştıran görev BİLEREK YOK. İlk
+# kurulum verisi `site:kur` ile gelir; o komut veritabanı doluysa hiçbir şey
+# yapmaz.
+deployment:
+  tasks:
+    - export WEBROOT=/home/KULLANICI/public_html
+    - export APPPATH=/home/KULLANICI/public_html/necipoglu_app
+    - export LOG=/home/KULLANICI/deploy-son.log
+    - export PHPBIN=$(command -v php || echo /opt/cpanel/ea-php83/root/usr/bin/php)
+    - date > $LOG 2>&1
+    - echo "APPPATH=$APPPATH WEBROOT=$WEBROOT PHPBIN=$PHPBIN" >> $LOG 2>&1
+    - $PHPBIN -v >> $LOG 2>&1 || echo "PHP CALISMADI" >> $LOG 2>&1
+    - echo "--- 1/6 uygulama dosyalari ---" >> $LOG 2>&1
+    - /bin/mkdir -p $APPPATH >> $LOG 2>&1
+    - /bin/rm -rf $APPPATH/app $APPPATH/bootstrap/app.php $APPPATH/bootstrap/providers.php $APPPATH/config $APPPATH/database $APPPATH/deploy $APPPATH/lang $APPPATH/public $APPPATH/resources $APPPATH/routes >> $LOG 2>&1
+    - /bin/cp -a app artisan bootstrap composer.json composer.lock config database deploy lang public resources routes .env.production.example $APPPATH/ >> $LOG 2>&1
+    - test -d vendor && /bin/rm -rf $APPPATH/vendor >> $LOG 2>&1 || true
+    - test -d vendor && /bin/cp -a vendor $APPPATH/ >> $LOG 2>&1 || echo "vendor depoda yok" >> $LOG 2>&1
+    - echo "--- 2/6 storage iskeleti ve izinler ---" >> $LOG 2>&1
+    - /bin/mkdir -p $APPPATH/storage/framework/cache/data $APPPATH/storage/framework/sessions $APPPATH/storage/framework/views $APPPATH/storage/logs $APPPATH/storage/app/private $APPPATH/bootstrap/cache >> $LOG 2>&1
+    - chmod -R 775 $APPPATH/storage $APPPATH/bootstrap/cache >> $LOG 2>&1 || true
+    - echo "--- 3/6 klasoru webe kapat ---" >> $LOG 2>&1
+    - /bin/cp deploy/cpanel/app.htaccess $APPPATH/.htaccess >> $LOG 2>&1
+    - echo "--- 4/6 public icerigi web kokune ---" >> $LOG 2>&1
+    - /bin/rm -rf $WEBROOT/build $WEBROOT/brand $WEBROOT/market >> $LOG 2>&1
+    - /bin/cp -a public/build public/brand public/market public/css public/js public/fonts $WEBROOT/ >> $LOG 2>&1
+    - /bin/cp -a public/favicon.ico public/favicon.svg public/robots.txt $WEBROOT/ >> $LOG 2>&1
+    - /bin/cp deploy/cpanel/index.php $WEBROOT/index.php >> $LOG 2>&1
+    - /bin/cp public/.htaccess $WEBROOT/.htaccess >> $LOG 2>&1
+    - echo "--- 5/6 yuklenen gorseller klasoru ---" >> $LOG 2>&1
+    - /bin/mkdir -p $WEBROOT/storage >> $LOG 2>&1
+    - /bin/cp -rn deploy/ilk-medya/media $WEBROOT/storage/ >> $LOG 2>&1 || true
+    - echo "--- 6/6 gocler, ilk kurulum, onbellek, yonetici ---" >> $LOG 2>&1
+    - cd $APPPATH && $PHPBIN artisan migrate --force >> $LOG 2>&1 || echo "MIGRATE ATLANDI - .env ve vendor var mi" >> $LOG 2>&1
+    - cd $APPPATH && $PHPBIN artisan site:kur >> $LOG 2>&1 || echo "SITE KURULUMU ATLANDI" >> $LOG 2>&1
+    - cd $APPPATH && $PHPBIN artisan admin:olustur >> $LOG 2>&1 || true
+    - cd $APPPATH && $PHPBIN artisan optimize:clear >> $LOG 2>&1 || true
+    - cd $APPPATH && $PHPBIN artisan optimize >> $LOG 2>&1 || true
+    - cd $APPPATH && $PHPBIN artisan filament:optimize >> $LOG 2>&1 || true
+    - echo "=== DEPLOY BITTI ===" >> $LOG 2>&1

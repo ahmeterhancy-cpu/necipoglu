@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Yönetim paneli ve yapım aşaması PIN formu dizine girmemeli.
+# (Sepet, ödeme ve hesap yolları katalog modunda zaten 404 dönüyor.)
+Disallow: /admin
+Disallow: /onizleme-pin
+
+Sitemap: https://www.necipoglu.com/sitemap.xml

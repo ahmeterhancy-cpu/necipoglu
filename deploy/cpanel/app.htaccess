@@ -1,0 +1,11 @@
+# public_html/necipoglu_app/.htaccess — uygulama klasörünü web'e kapatır.
+# Bu dosya olmazsa .env, veritabanı parolası ve APP_KEY tarayıcıdan indirilir.
+# Bilerek sade: LiteSpeed php_flag / -ExecCGI görünce 500 veriyor.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
+Options -Indexes

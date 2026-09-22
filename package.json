@@ -1,0 +1,17 @@
+{
+    "$schema": "https://www.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite",
+        "start": "concurrently -k -n php,vite -c blue,magenta \"php artisan serve --host=127.0.0.1 --port=8125\" \"vite\""
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.3.3",
+        "concurrently": "^9.2.4",
+        "laravel-vite-plugin": "^3.1",
+        "tailwindcss": "^4.3.3",
+        "vite": "^8.0.0"
+    }
+}

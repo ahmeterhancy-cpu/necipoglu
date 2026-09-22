@@ -1,0 +1,1079 @@
+@import 'tailwindcss';
+
+@source '../views';
+@source '../../app';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+/* ==========================================================================
+   CAHİT NECİPOĞLU — TASARIM SİSTEMİ
+   --------------------------------------------------------------------------
+   Referans dil: Ege Seramik · Bien Seramik · VitrA.
+   Ortak payda — açık zemin, fotoğrafın taşıdığı yerleşim, ölçülü tipografi,
+   bol boşluk, klasik katalog yapısı. Keskin kenar YOK — her kutu
+   --radius-* ölçeğinden bir yarıçap alır.
+
+   Ayrışma bu dilin dışına çıkmakla değil, işçilikle olur:
+     · Tipografi ölçeği ve satır aralığı referanslardan daha rafine.
+     · Boşluk daha cömert, ızgara daha disiplinli.
+     · Hareket elle yazıldı ve fotoğrafın hizmetinde — süs değil.
+
+   Antrasit burada yüzey değil MÜREKKEP. Zemin serin nötr, yazı antrasit.
+   Koyu antrasit yalnızca kontrast anlarında tam bölüm olarak kullanılır.
+   ========================================================================== */
+
+@theme {
+  /* — Zemin: kağıt ————————————————————————————————————————— */
+  --color-paper:   #FFFFFF;
+  --color-paper-2: #F1F2F3;   /* serin nötr — ana zemin */
+  --color-paper-3: #E4E6E8;   /* girinti / kart zemini */
+  --color-line:    #D6D9DC;   /* saç teli kenarlık */
+
+  /* — Mürekkep: açık antrasit ailesi ——————————————————————— */
+  --color-ink:     #383E42;   /* marka antrasiti — başlık ve koyu bölüm */
+  --color-ink-2:   #2C3134;   /* daha koyu kontrast yüzeyi */
+  --color-body:    #4A5155;   /* gövde metni */
+  --color-mute:    #7C8489;   /* ikincil metin */
+
+  /* — Vurgu: kil. Yalnızca etkileşim ve küçük işaretlerde. ——— */
+  --color-clay:    #9C7248;
+  --color-clay-2:  #B08A5F;
+
+  /* — Tipografi ————————————————————————————————————————————— */
+  --font-display: 'Archivo', 'Archivo Fallback', system-ui, sans-serif;
+  --font-body:    'Inter', 'Inter Fallback', system-ui, sans-serif;
+  --font-sans:    'Inter', 'Inter Fallback', system-ui, sans-serif;
+
+  /* — Köşe yarıçapı ————————————————————————————————————————
+     Keskin kenar kullanmıyoruz; her kutu bu ölçekten bir değer alır.
+     Tailwind'in rounded-* yardımcıları da bu jetonları okur. */
+  --radius-sm: .5rem;      /* buton, küçük etiket, form kutusu */
+  --radius-md: .875rem;    /* çerçeveli panel, kart */
+  --radius-lg: 1.25rem;    /* görsel çerçevesi, kategori kartı */
+
+  --ease-out-q: cubic-bezier(.16, 1, .3, 1);
+  --ease-io:    cubic-bezier(.66, 0, .24, 1);
+}
+
+@layer base {
+
+/* ==========================================================================
+   1 — TEMEL
+   ========================================================================== */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  /* clip — hidden DEĞİL. hidden, html/body'yi kaydırma kabına çevirip
+     position:sticky kullanan her bölümü sessizce bozar. */
+  overflow-x: clip;
+  background: var(--color-paper-2);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  overflow-x: clip;
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html:not(.motion-ready) [data-reveal] { opacity: 0; }
+
+/* Motor çalışmadıysa (bkz. layout'taki güvenlik ağı) hiçbir şey gizli
+   kalmaz — animasyon olmaz ama içerik okunur. */
+html.motion-failed [data-reveal],
+html.motion-failed [data-draw] { opacity: 1 !important; transform: none !important; }
+html.motion-failed [data-veil] > img,
+html.motion-failed [data-veil] > video,
+html.motion-failed [data-veil] > .veil-inner { clip-path: none !important; transform: none !important; }
+html.motion-failed .m-word { transform: none !important; }
+
+a { color: inherit; text-decoration: none; }
+img, svg, video { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+input, textarea, select { font: inherit; color: inherit; }
+
+::selection { background: var(--color-ink); color: var(--color-paper); }
+
+:focus-visible { outline: 2px solid var(--color-clay); outline-offset: 3px; }
+
+} /* @layer base */
+
+@layer components {
+
+/* ==========================================================================
+   2 — YERLEŞİM
+   --------------------------------------------------------------------------
+   İçerik ekranın ~%88'i, üst sınır 1680px. Bölüm aralığı referanslardan
+   cömert: 96–160px.
+   ========================================================================== */
+
+:root {
+  --gutter: clamp(1.25rem, 5vw, 5rem);
+  --maxw: 105rem;
+  --topbar: clamp(4rem, 5.4vw, 5.25rem);
+}
+
+.shell {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.shell-narrow {
+  width: 100%;
+  max-width: 60rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Tam genişlik — hero ve mekân görselleri kenardan kenara. */
+.bleed { width: 100%; }
+
+.band       { padding-block: clamp(4.5rem, 10vw, 10rem); }
+.band-tight { padding-block: clamp(3rem, 6vw, 5.5rem); }
+
+.surface-paper   { background: var(--color-paper);   color: var(--color-ink); }
+.surface-paper-2 { background: var(--color-paper-2); color: var(--color-ink); }
+.surface-paper-3 { background: var(--color-paper-3); color: var(--color-ink); }
+.surface-ink     { background: var(--color-ink);     color: var(--color-paper-2); }
+.surface-ink-2   { background: var(--color-ink-2);   color: var(--color-paper-2); }
+
+.grid12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(1rem, 2vw, 2.25rem);
+}
+
+@media (max-width: 900px) {
+  .grid12 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+
+/* ==========================================================================
+   3 — TİPOGRAFİ
+   --------------------------------------------------------------------------
+   Referanslarda başlık 44–56px. Ölçek oraya oturur; en büyük boy bile
+   bağırmaz. Rafine olan boyut değil, harf aralığı ve satır yüksekliği.
+   ========================================================================== */
+
+.h1, .h2, .h3, .h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -.022em;
+  line-height: 1.08;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.h1 { font-size: clamp(2.125rem, 3.9vw, 3.75rem); letter-spacing: -.028em; }
+.h2 { font-size: clamp(1.5rem, 2.05vw, 2.125rem); }
+.h3 { font-size: clamp(1.25rem, 1.7vw, 1.625rem); line-height: 1.16; letter-spacing: -.016em; }
+.h4 { font-size: clamp(1.0625rem, 1.2vw, 1.1875rem); line-height: 1.25; letter-spacing: -.01em; font-weight: 600; }
+
+/* Bölüm etiketi — küçük, aralıklı, versal. */
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: .6875rem;
+  font-weight: 600;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--color-clay);
+}
+
+.eyebrow-mute { color: var(--color-mute); }
+
+.lede {
+  font-size: clamp(1.0625rem, 1.25vw, 1.25rem);
+  line-height: 1.6;
+  letter-spacing: -.009em;
+  color: var(--color-body);
+  max-width: 52ch;
+}
+
+.body-m { font-size: 1rem; line-height: 1.7; color: var(--color-body); max-width: 66ch; }
+.body-s { font-size: .875rem; line-height: 1.6; color: var(--color-body); }
+
+.surface-ink .lede,
+.surface-ink .body-m,
+.surface-ink .body-s,
+.surface-ink-2 .lede,
+.surface-ink-2 .body-m,
+.surface-ink-2 .body-s { color: color-mix(in srgb, var(--color-paper-2) 72%, transparent); }
+
+.surface-ink .eyebrow,
+.surface-ink-2 .eyebrow { color: var(--color-clay-2); }
+
+.mute { color: var(--color-mute); }
+.tnum { font-variant-numeric: tabular-nums; }
+
+.rule { height: 1px; border: 0; margin: 0; background: var(--color-line); }
+.surface-ink .rule,
+.surface-ink-2 .rule { background: color-mix(in srgb, var(--color-paper-2) 18%, transparent); }
+
+/* ==========================================================================
+   4 — GÖRSEL ÇERÇEVESİ
+   --------------------------------------------------------------------------
+   Fotoğraf bu sitenin ana malzemesi. Çerçeve sabit oranda durur, görsel
+   içeride hareket eder — yerleşim asla kaymaz.
+   ========================================================================== */
+
+.shot {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--color-paper-3);
+}
+
+.shot > img,
+.shot > video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ar-square   { aspect-ratio: 1 / 1; }
+.ar-portrait { aspect-ratio: 3 / 4; }
+.ar-tall     { aspect-ratio: 2 / 3; }
+.ar-photo    { aspect-ratio: 4 / 3; }
+.ar-wide     { aspect-ratio: 16 / 9; }
+.ar-cinema   { aspect-ratio: 21 / 9; }
+
+/* Perde açılışı — görsel alttan yukarı açılır, içeriği ters yönde iner. */
+[data-veil] > img,
+[data-veil] > video,
+[data-veil] > .veil-inner {
+  clip-path: inset(0 0 100% 0);
+  transform: scale(1.12);
+  transition:
+    clip-path 1.1s var(--ease-io),
+    transform 1.5s var(--ease-io);
+}
+
+[data-veil].is-in > img,
+[data-veil].is-in > video,
+[data-veil].is-in > .veil-inner {
+  clip-path: inset(0 0 0 0);
+  transform: scale(1);
+}
+
+html:not(.motion-ready) [data-veil] > img { clip-path: none; transform: none; }
+
+/* Kart hover — görsel çok hafif yaklaşır. Referanslardaki sakinlik korunur. */
+.card-shot img { transition: transform 1.1s var(--ease-out-q); }
+.card:hover .card-shot img { transform: scale(1.035); }
+
+.card-title { transition: color .35s; }
+.card:hover .card-title { color: var(--color-clay); }
+
+/* ==========================================================================
+   4b — KATEGORİ KARTI
+   --------------------------------------------------------------------------
+   İsim görselin içinde, sol üstte. Yuvarlatılmış köşe. Fotoğrafın parlak
+   ya da koyu olması fark etmesin diye üstte bir perde var — beyaz yazı her
+   fotoğrafta okunur kalır.
+   ========================================================================== */
+
+:root { --radius-card: var(--radius-lg); }
+
+.cat-card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--color-paper-3);
+  aspect-ratio: 4 / 5;
+}
+
+.cat-card > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.2s var(--ease-out-q);
+}
+
+.cat-card:hover > img { transform: scale(1.045); }
+
+/* Hakkımızda sayfasında altı kart tek satırda duruyor; 4/5 dikey oran
+   o genişlikte fazla uzuyordu. */
+.cat-card-square { aspect-ratio: 1 / 1; }
+
+/* Üst perde — yazının arkasını hafifçe koyulaştırır, alta doğru kaybolur. */
+.cat-card::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 52%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(24, 28, 30, .62) 0%,
+    rgba(24, 28, 30, .34) 42%,
+    transparent 100%
+  );
+}
+
+.cat-card-label {
+  position: absolute;
+  z-index: 2;
+  top: clamp(1.125rem, 1.9vw, 1.75rem);
+  left: clamp(1.125rem, 1.9vw, 1.75rem);
+  right: clamp(1.125rem, 1.9vw, 1.75rem);
+  font-family: var(--font-display);
+  font-size: clamp(1.0625rem, 1.3vw, 1.4375rem);
+  font-weight: 500;
+  letter-spacing: -.014em;
+  line-height: 1.1;
+  color: #FFFFFF;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-card:hover > img { transform: none; }
+}
+
+/* ==========================================================================
+   4c — YATAY RAY
+   --------------------------------------------------------------------------
+   Kartlar tek sırada durur. --rail-visible kadarı ekrana sığacak şekilde
+   ölçülür; fazlası sağa taşar ve ray sola kaydırılır. Dokunmatikte doğal
+   kaydırma, farede sürükleme ve ok tuşları çalışır.
+   ========================================================================== */
+
+.rail {
+  --rail-visible: 6;
+  --rail-gap: clamp(.75rem, 1.1vw, 1.25rem);
+
+  display: flex;
+  gap: var(--rail-gap);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  cursor: grab;
+
+  /* İlk kart içerik kolonuyla hizalanır, son kart ekranın sağına taşar. */
+  padding-inline: max(var(--gutter), calc((100% - var(--maxw)) / 2 + var(--gutter)));
+  scroll-padding-inline: max(var(--gutter), calc((100% - var(--maxw)) / 2 + var(--gutter)));
+
+  /* Kaydırma çubuğu gizli — konumu ayrı bir göstergeyle veriliyor. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.rail::-webkit-scrollbar { display: none; }
+
+/* Marka sayfasındaki görsel şeridi. Altı kart bir uygulama fotoğrafını
+   pul boyutuna indiriyordu; burada üç kart görünür. */
+.rail-wide { --rail-visible: 3; }
+
+.rail.is-dragging { cursor: grabbing; scroll-snap-type: none; }
+.rail.is-dragging * { pointer-events: none; }
+
+.rail > * {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: calc(
+    (min(100%, var(--maxw)) - 2 * var(--gutter)
+      - (var(--rail-visible) - 1) * var(--rail-gap)) / var(--rail-visible)
+  );
+  min-width: 12rem;
+}
+
+@media (max-width: 900px) { .rail > * { min-width: 15rem; } }
+@media (max-width: 560px) { .rail > * { min-width: 72vw; } }
+
+/* Ray denetimleri — ok düğmeleri ve konum göstergesi. */
+.rail-btn {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--color-line);
+  border-radius: 50%;
+  color: var(--color-ink);
+  transition: color .3s, border-color .3s, background-color .3s, opacity .3s;
+}
+
+.rail-btn:hover { color: var(--color-paper); background: var(--color-ink); border-color: var(--color-ink); }
+.rail-btn[aria-disabled='true'] { opacity: .3; pointer-events: none; }
+
+.rail-track {
+  position: relative;
+  height: 2px;
+  background: var(--color-line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.rail-thumb {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 100%;
+  background: var(--color-ink);
+  transform-origin: left center;
+  will-change: transform;
+}
+
+/* Kartlar zaten sığıyorsa ray denetimlerine gerek yok. */
+.rail-idle [data-rail-prev],
+.rail-idle [data-rail-next],
+.rail-idle .rail-track { display: none; }
+
+.rail-idle .rail { cursor: default; }
+
+/* ==========================================================================
+   4d — YATAY PİN
+   --------------------------------------------------------------------------
+   Bölüm ekrana kilitlenir; sayfa aşağı kaydırıldıkça kartlar yana kayar.
+   Bölümün yüksekliği, rayın taşan genişliği kadar uzatılır — böylece
+   dikey kaydırma mesafesi yatay yol ile birebir örtüşür.
+
+   Pin yalnızca fare/kalem gibi hassas işaretleyicilerde ve hareket
+   azaltma kapalıyken açılır. Dokunmatikte parmakla yana kaydırma çok
+   daha doğal olduğu için bölüm normal raya düşer.
+   ========================================================================== */
+
+.pin { position: relative; }
+
+.pin-stage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(1.5rem, 3vw, 2.75rem);
+}
+
+.pin.is-pinned .pin-stage {
+  position: sticky;
+  top: var(--topbar);
+  height: calc(100svh - var(--topbar));
+  overflow: hidden;
+}
+
+/* Pin açıkken ray dönüşümle sürülür — kendi kaydırması kapalı. */
+.pin.is-pinned .rail {
+  overflow: visible;
+  scroll-snap-type: none;
+  cursor: default;
+  will-change: transform;
+}
+
+.pin.is-pinned .rail > * { scroll-snap-align: none; }
+
+/* Pin açıkken kart daha iri: dörtte biri ekranda, kalanı yana kayar. */
+.pin.is-pinned .rail { --rail-visible: 4; }
+
+@media (max-width: 1100px) {
+  .pin.is-pinned .rail { --rail-visible: 3; }
+}
+
+/* ==========================================================================
+   5 — BUTON VE BAĞLANTI
+   --------------------------------------------------------------------------
+   Referanslardaki gibi sade ve dikdörtgen. Ayrım işçilikte: dolgu
+   soldan akar, ok ilerler.
+   ========================================================================== */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: .75rem;
+  padding: 1rem 1.75rem;
+  overflow: hidden;
+  isolation: isolate;
+  font-family: var(--font-display);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--color-paper);
+  background: var(--color-ink);
+  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-sm);
+  transition: color .4s var(--ease-out-q), border-color .4s var(--ease-out-q);
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-clay);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .5s var(--ease-out-q);
+}
+
+.btn:hover { border-color: var(--color-clay); }
+.btn:hover::before { transform: scaleX(1); }
+
+.btn-line {
+  color: var(--color-ink);
+  background: transparent;
+  border-color: var(--color-line);
+}
+
+.btn-line::before { background: var(--color-ink); }
+.btn-line:hover { color: var(--color-paper); border-color: var(--color-ink); }
+
+.surface-ink .btn-line,
+.surface-ink-2 .btn-line {
+  color: var(--color-paper-2);
+  border-color: color-mix(in srgb, var(--color-paper-2) 28%, transparent);
+}
+
+.surface-ink .btn-line::before,
+.surface-ink-2 .btn-line::before { background: var(--color-paper-2); }
+
+.surface-ink .btn-line:hover,
+.surface-ink-2 .btn-line:hover { color: var(--color-ink); border-color: var(--color-paper-2); }
+
+.btn svg { transition: transform .4s var(--ease-out-q); }
+.btn:hover svg { transform: translateX(.25rem); }
+
+/* Metin bağlantısı — referanslardaki "Detay" / "Keşfet" karşılığı. */
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: .625rem;
+  font-family: var(--font-display);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--color-ink);
+}
+
+.more::after {
+  content: '';
+  width: 1.75rem;
+  height: 1px;
+  background: currentColor;
+  transition: width .4s var(--ease-out-q);
+}
+
+.more:hover::after { width: 2.75rem; }
+
+.surface-ink .more,
+.surface-ink-2 .more { color: var(--color-paper-2); }
+
+.link {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 1px;
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform .45s var(--ease-out-q);
+}
+
+.link:hover::after { transform: scaleX(1); transform-origin: left center; }
+
+/* ==========================================================================
+   6 — ÜST BAR
+   --------------------------------------------------------------------------
+   Referanslardaki gibi yapışkan ve iki durumlu: hero üzerindeyken saydam
+   ve beyaz yazı, aşağıda beyaz zemin ve koyu yazı.
+   ========================================================================== */
+
+.topbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 90;
+  color: var(--color-paper);
+  border-bottom: 1px solid transparent;
+  transition:
+    transform .45s var(--ease-out-q),
+    background-color .35s linear,
+    color .35s linear,
+    border-color .35s linear;
+}
+
+/* Fotoğrafın üzerindeyken PERDE.
+   Beyaz yazıyı çıplak fotoğrafa bırakmak çubuğu zayıf gösteriyordu —
+   açık bir kadrajda kontrast tamamen çöküyor. Yukarıdan aşağı sönen
+   ince bir karartma yazıyı her fotoğrafta okunur tutar; çubuk beyaza
+   döndüğünde perde de kaybolur. */
+.topbar::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: calc(var(--topbar) * 1.9);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-ink-2) 62%, transparent),
+    color-mix(in srgb, var(--color-ink-2) 28%, transparent) 55%,
+    transparent);
+  pointer-events: none;
+  transition: opacity .35s linear;
+}
+
+.topbar.is-hidden { transform: translate3d(0, -100%, 0); }
+
+.topbar.is-solid {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  border-bottom-color: var(--color-line);
+  box-shadow: 0 .5rem 1.5rem color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+
+.topbar.is-solid::before { opacity: 0; }
+
+.topbar-inner {
+  position: relative;   /* perde içeriğin ARKASINDA kalsın */
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  height: var(--topbar);
+}
+
+.topbar-logo {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  height: clamp(1.5rem, 2.3vw, 2.125rem);
+  aspect-ratio: 181 / 47;
+}
+
+.topbar-logo img {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  transition: opacity .35s linear;
+}
+
+.topbar-logo .logo-dark { opacity: 0; }
+.topbar.is-solid .topbar-logo .logo-light { opacity: 0; }
+.topbar.is-solid .topbar-logo .logo-dark { opacity: 1; }
+
+/* Dokuz maddeyle birlikte aralik daraldi. nowrap olmadan flex, etiketi
+   kelime ortasindan iki satira bolüyordu ("CN / TV"). */
+.nav { display: flex; align-items: center; gap: clamp(.75rem, 1.6vw, 1.75rem); }
+
+.nav a {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: .8125rem;
+  font-weight: 600;
+  letter-spacing: .085em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: .92;
+  padding-block: .25rem;
+  transition: opacity .3s;
+}
+
+.nav a::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform .4s var(--ease-out-q);
+}
+
+.nav a:hover { opacity: 1; }
+.nav a:hover::after,
+.nav a[aria-current='page']::after { transform: scaleX(1); transform-origin: left center; }
+
+/* Dokuz madde + sağ küme ancak 1260px'de sığıyor; sepet sayısı iki
+   haneye çıkınca küme genişliyor, o yüzden pay bırakıldı. */
+@media (max-width: 1300px) { .nav { display: none; } }
+
+/* ==========================================================================
+   7 — MENÜ
+   ========================================================================== */
+
+.menu-toggle { position: relative; width: 2.5rem; height: 2.5rem; margin-right: -.55rem; }
+
+.menu-toggle span {
+  position: absolute;
+  left: .625rem; right: .625rem;
+  height: 1.5px;
+  background: currentColor;
+  transition: transform .4s var(--ease-io);
+}
+
+.menu-toggle span:nth-child(1) { top: 1.0625rem; }
+.menu-toggle span:nth-child(2) { top: 1.375rem; }
+
+body.menu-open .menu-toggle span:nth-child(1) { top: 1.21875rem; transform: rotate(45deg); }
+body.menu-open .menu-toggle span:nth-child(2) { top: 1.21875rem; transform: rotate(-45deg); }
+
+/* Bu esik .nav'inkiyle TAMAMLAYICI olmak zorunda: .nav 1300px altinda
+   gizleniyor, hamburger 1301px ustunde. Ikisi ayrisirsa arada gezinmenin
+   tamamen kayboldugu bir bant olusur. */
+@media (min-width: 1301px) { .menu-toggle { display: none; } }
+
+.menu-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  display: grid;
+  align-content: center;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .3s linear, visibility .3s;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+body.menu-open .menu-panel { visibility: visible; opacity: 1; }
+
+.menu-link {
+  display: block;
+  padding: clamp(.75rem, 1.8vh, 1.125rem) 0;
+  border-bottom: 1px solid var(--color-line);
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 6vw, 2.25rem);
+  font-weight: 500;
+  letter-spacing: -.024em;
+  line-height: 1.1;
+  opacity: 0;
+  transform: translate3d(0, .75rem, 0);
+  transition: opacity .45s var(--ease-out-q), transform .45s var(--ease-out-q), color .3s;
+}
+
+.menu-link:hover { color: var(--color-clay); }
+
+body.menu-open .menu-link { opacity: 1; transform: none; }
+
+/* ==========================================================================
+   8 — HAREKET
+   --------------------------------------------------------------------------
+   Referanslarda hareket neredeyse yok. Farkı burada açıyoruz — ama her
+   hareket fotoğrafın ya da metnin hizmetinde, kendini göstermek için değil.
+   ========================================================================== */
+
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 1.5rem, 0);
+  transition: opacity .85s var(--ease-out-q), transform .85s var(--ease-out-q);
+}
+
+[data-reveal='fade'] { transform: none; }
+
+/* Ölçek varyantı: iki görünümde zaten çağrılıyordu ama tanımlı değildi,
+   sessizce varsayılana düşüyordu. Kutu hafifçe büyüyerek yerleşir —
+   çerçeveli öğelerde yukarı kaymaktan daha doğru duruyor. */
+[data-reveal='scale'] { transform: scale(.965); }
+
+[data-reveal].is-in  { opacity: 1; transform: none; }
+
+/* Satır maskesi — başlıklar satır satır yükselir. */
+.m-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: .1em;
+  margin-bottom: -.1em;
+}
+
+.m-word {
+  display: inline-block;
+  transform: translate3d(0, 110%, 0);
+  transition: transform .95s var(--ease-out-q);
+}
+
+.m-line.is-in .m-word { transform: none; }
+
+html:not(.motion-ready) .m-word { transform: none; }
+
+/* Çizilen çizgi. */
+[data-draw] {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 1.1s var(--ease-io);
+}
+
+[data-draw].is-in { transform: scaleX(1); }
+
+html:not(.motion-ready) [data-draw] { transform: none; }
+
+/* Sayfa ilerleme çubuğu. */
+.progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 95;
+  height: 2px;
+  transform-origin: left center;
+  transform: scaleX(0);
+  background: var(--color-clay);
+}
+
+/* ==========================================================================
+   9 — MARKA DUVARI
+   --------------------------------------------------------------------------
+   Temsil edilen üreticiler. Hücreleri ÇİZGİ değil BOŞLUK ayırır —
+   tam ızgara çok sert duruyordu; logo duvarında ritmi aralık kurar.
+   Logo yüklenmemişse marka adı tipografiyle durur; logo gelince otomatik
+   olarak onun yerini alır.
+   ========================================================================== */
+
+.brand-wall {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(.75rem, 1.6vw, 1.5rem);
+}
+
+@media (min-width: 640px)  { .brand-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .brand-wall { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+
+.brand-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .625rem;
+  aspect-ratio: 3 / 2;
+  padding: clamp(.875rem, 1.6vw, 1.5rem);
+  text-align: center;
+  border-radius: var(--radius-md);
+  background: var(--color-paper-2);
+  transition: background-color .4s var(--ease-out-q);
+}
+
+/* Logoların zemini saydamlaştırıldığı için hücre serbestçe renk
+   değiştirebiliyor — arkalarında beyaz dikdörtgen kalmıyor. */
+.brand-cell:hover { background: var(--color-paper-3); }
+
+/* Gri filtre YOK. Bazi markalarin isareti beyaz yazinin renkli zemine
+   oyulmasiyla kuruluyor (hansgrohe, ACO, El Molino); desatüre edilince
+   olu bir gri dikdortgene donusuyorlardi. Logolar gercek renginde durur;
+   geri bildirim hucre zemininden gelir. */
+.brand-cell img {
+  max-height: clamp(1.75rem, 3vw, 2.75rem);
+  max-width: 100%;
+  width: auto;
+  object-fit: contain;
+}
+
+.brand-name {
+  font-family: var(--font-display);
+  font-size: clamp(.9375rem, 1.15vw, 1.1875rem);
+  font-weight: 500;
+  letter-spacing: -.012em;
+  line-height: 1.15;
+  transition: color .35s;
+}
+
+.brand-cell:hover .brand-name { color: var(--color-clay); }
+
+.brand-meta {
+  font-family: var(--font-display);
+  font-size: .625rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+}
+
+/* — Karo kutu ————————————————————————————————————————————
+   Ürün grubu gibi kısa etiket taşıyan kutular. Üzerine gelince zemin bir
+   ton koyulaşır ve kutu bir tık yükselir — tıklanabilir değil, ama ölü
+   de durmuyor. */
+.tile {
+  border-radius: var(--radius-md);
+  background: var(--color-paper-2);
+  padding: clamp(1.25rem, 2.4vw, 1.75rem);
+  transition: background-color .4s var(--ease-out-q), transform .4s var(--ease-out-q);
+  will-change: transform;
+}
+
+.tile:hover {
+  background: var(--color-paper-3);
+  transform: translateY(-.25rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile:hover { transform: none; }
+}
+
+/* ==========================================================================
+   9b — LİSTE SATIRI
+   --------------------------------------------------------------------------
+   Şube, iştirak, yazı ve benzeri listeler. Kart değil, ruled satır —
+   referans sitelerdeki sade kurumsal listelerin rafine hali.
+   ========================================================================== */
+
+.list { border-top: 1px solid var(--color-line); }
+
+.list-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: clamp(1rem, 3vw, 3rem);
+  padding: clamp(1.25rem, 2.4vw, 2rem) 0;
+  border-bottom: 1px solid var(--color-line);
+  transition: padding-left .45s var(--ease-out-q);
+}
+
+.list-row > * { min-width: 0; }
+.list-row > :first-child { flex: 1 1 auto; }
+
+.list-row:hover { padding-left: clamp(.75rem, 1.6vw, 1.25rem); }
+
+.surface-ink .list,
+.surface-ink .list-row,
+.surface-ink-2 .list,
+.surface-ink-2 .list-row { border-color: color-mix(in srgb, var(--color-paper-2) 18%, transparent); }
+
+/* Koyu zeminde ikincil metin. --color-mute açık zemin için seçilmişti;
+   antrasit üzerinde kontrastı 3.4:1'e düşüyor ve adres satırları
+   okunmuyordu. Burada kağıt renginden türetiliyor. */
+.surface-ink .list-note,
+.surface-ink .list-meta,
+.surface-ink-2 .list-note,
+.surface-ink-2 .list-meta { color: color-mix(in srgb, var(--color-paper-2) 64%, transparent); }
+
+.list-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 1.7vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: -.018em;
+  line-height: 1.14;
+  transition: color .35s;
+}
+
+.list-row:hover .list-title { color: var(--color-clay); }
+
+.list-note { font-size: .875rem; line-height: 1.55; color: var(--color-mute); margin-top: .375rem; }
+
+.list-meta {
+  font-family: var(--font-display);
+  font-size: .6875rem;
+  font-weight: 600;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--color-mute);
+}
+
+/* Gri tondan renge — referans ve marka görselleri. */
+.desaturate { filter: grayscale(1) contrast(1.03); transition: filter .55s var(--ease-out-q); }
+.desaturate:hover,
+.group:hover .desaturate { filter: grayscale(0) contrast(1); }
+
+/* ==========================================================================
+   10 — ÖZEL İMLEÇ
+   ========================================================================== */
+
+.cursor {
+  position: fixed;
+  top: 0; left: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  width: 5rem;
+  height: 5rem;
+  margin: -2.5rem 0 0 -2.5rem;
+  border-radius: 50%;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-display);
+  font-size: .5625rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(.25);
+  transition: opacity .25s, transform .4s var(--ease-out-q);
+  will-change: transform;
+}
+
+.cursor.is-on { opacity: 1; transform: scale(1); }
+
+@media (hover: none), (pointer: coarse) { .cursor { display: none; } }
+
+/* ==========================================================================
+   11 — SAYFA GEÇİŞİ
+   ========================================================================== */
+
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: var(--color-ink);
+  transform: scaleY(0);
+  transform-origin: bottom center;
+  pointer-events: none;
+}
+
+.veil.is-out { transform: scaleY(1); transform-origin: bottom center; transition: transform .5s var(--ease-io); }
+.veil.is-in  { transform: scaleY(0); transform-origin: top center;    transition: transform .5s var(--ease-io); }
+
+/* ==========================================================================
+   12 — GÖRSEL YOKKEN
+   --------------------------------------------------------------------------
+   Panele fotoğraf yüklenene kadar geçici yüzey. Nötr ve sessiz durur —
+   tasarımın kendisi olduğu izlenimini vermez.
+   ========================================================================== */
+
+.placeholder {
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: var(--color-paper-3);
+}
+
+.placeholder::after {
+  content: attr(data-label);
+  font-family: var(--font-display);
+  font-size: .625rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+}
+
+.surface-ink .placeholder,
+.surface-ink-2 .placeholder { background: color-mix(in srgb, var(--color-paper-2) 10%, transparent); }
+
+/* ==========================================================================
+   13 — HAREKET AZALTMA
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  [data-reveal],
+  [data-reveal].is-in { opacity: 1; transform: none; transition: none; }
+
+  .m-word { transform: none !important; transition: none; }
+  [data-draw] { transform: none !important; transition: none; }
+
+  [data-veil] > img,
+  [data-veil] > video { clip-path: none !important; transform: none !important; transition: none; }
+
+  .card:hover .card-shot img { transform: none; }
+}
+
+} /* @layer components */

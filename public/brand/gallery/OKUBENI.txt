@@ -1,0 +1,64 @@
+MARKA SAYFASI GÖRSELLERİ — nereye ne yüklenecek
+====================================================
+
+DURUM (2026-09-09): 30 markanın 23'ünde görsel var (47 adet).
+Görseli olmayanlar: Carrox Phoenix, Cypdus, Dune, Luca, omG,
+Platera, Sonia.
+
+Her markanın klasörü bu dizinde hazır. Görselleri doğrudan
+ilgili klasörün İÇİNE atın, site otomatik görür.
+
+BİÇİM   : jpg tercih edin (png fotoğraf için 10-15 kat büyük)
+ORAN    : KARE (1:1). Şerit kare çerçeve kullanıyor; başka
+          oranda gelen görsel ortadan kırpılır.
+ÖLÇÜ    : 1000x1000 - 1400x1400 yeterli
+BOYUT   : dosya başına 250 KB altı hedefleyin
+SIRA    : dosya adına göre — 01.jpg, 02.jpg, 03.jpg
+ADET    : sınır yok; 3-6 arası iyi durur
+
+Örnek:
+  public/brand/gallery/duravit/01.jpg
+  public/brand/gallery/duravit/02.jpg
+
+PANELDEN DE YÜKLEYEBİLİRSİNİZ
+Yönetim > Markalar > (marka) > "Marka sayfası görselleri".
+Panelden BİR TANE bile yüklerseniz o marka için bu klasöre
+artık bakılmaz — iki kaynağı karıştırmamak için.
+
+ORİJİNALLER
+İlk gönderdiğiniz 1000x1000 PNG'ler (60,7 MB) sıkıştırılıp
+buraya taşındı; ham hâlleri storage/app/brand-gallery-kaynak/
+altında duruyor. Web köküne açık değil, silmeden önce sorun.
+
+KLASÖRLER (marka adı -> klasör -> mevcut görsel)
+----------------------------------------------------
+ACO                        aco/                   2 görsel
+AXOR                       axor/                  2 görsel
+Alaplana                   alaplana/              3 görsel
+Anka Seramik               anka-seramik/          2 görsel
+Carrox Phoenix             carrox/                — YOK
+Cypdus                     cypdus/                — YOK
+Decor Walther              decor-walther/         2 görsel
+Denko                      denko/                 2 görsel
+Dune                       dune/                  — YOK
+Duravit                    duravit/               2 görsel
+El Molino                  el-molino/             2 görsel
+Eva Banyo                  eva-banyo/             2 görsel
+Geberit                    geberit/               2 görsel
+Gedy                       gedy/                  2 görsel
+Grespania                  grespania/             2 görsel
+Ibero                      ibero/                 2 görsel
+Kare                       kare/                  1 görsel
+Keraben                    keraben/               2 görsel
+Line                       line/                  2 görsel
+Luca                       luca/                  — YOK
+NG Kütahya Seramik        ng-kutahya-seramik/    3 görsel
+Platera                    platera/               — YOK
+Sanacryl                   sanacryl/              2 görsel
+Smanni                     smanni/                2 görsel
+Sonia                      sonia/                 — YOK
+Teska                      teska/                 2 görsel
+Windisch                   windisch/              2 görsel
+dura-bagno                 dura-bagno/            2 görsel
+hansgrohe                  hansgrohe/             2 görsel
+omG                        omg/                   — YOK

@@ -1,0 +1,13 @@
+Bu klasördeki görseller Unsplash'ten alınmış GEÇİCİ yer tutuculardır.
+
+Cahit Necipoğlu Yapı Market'in kendi mağaza fotoğrafları geldiğinde
+buradaki dosyaları silip yerine onları koyun; site otomatik görür.
+
+BİÇİM : jpg
+ORAN  : 4:3 yatay (şerit bu çerçeveyi kullanıyor)
+ÖLÇÜ  : uzun kenar 1400-2000 piksel
+SIRA  : dosya adına göre — 01.jpg, 02.jpg, 03.jpg
+ADET  : sınır yok; 3-6 arası iyi durur
+
+Sayfa başındaki geniş şerit fotoğrafı buradan DEĞİL, yönetim panelinden
+gelir: Ayarlar > Yapı Market > Tanıtım fotoğrafı.
